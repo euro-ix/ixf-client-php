@@ -157,24 +157,23 @@ class Object implements \ArrayAccess
     * @param array $values
     * @param boolean $partial Defaults to false.
     */
-    public function refreshFrom( $values, $partial=false )
+    public function refreshFrom( $values )
     {
-        if ($partial)
-            $removed = new Util\Set();
-        else
-            $removed = array_diff(array_keys($this->_values), array_keys($values));
+        $removed = array_diff( array_keys( $this->_values ), array_keys( $values ) );
 
-        foreach ($removed as $k) {
-            if (self::$permanentAttributes->includes($k))
+        foreach( $removed as $k )
+        {
+            if( self::$permanentAttributes->includes( $k ) )
                 continue;
-            unset($this->$k);
+            unset( $this->$k );
         }
 
-        foreach ($values as $k => $v) {
-            if (self::$permanentAttributes->includes($k))
+        foreach( $values as $k => $v )
+        {
+            if( self::$permanentAttributes->includes( $k ) )
                 continue;
 
-            $this->_values[$k] = Util::convertToIxfObject($v);
+            $this->_values[$k] = Util::convertToIxfObject( $v );
 
             $this->_transientValues->discard($k);
             $this->_unsavedValues->discard($k);
