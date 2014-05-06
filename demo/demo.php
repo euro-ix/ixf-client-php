@@ -35,9 +35,11 @@ if( is_array( $objs ) && isset( $objs['error'] ) )
 }
 
 foreach( $objs as $o )
-    echo $o->short_name . "\n";
+    echo $o->full_name . '[' . $o->short_name . '] => '
+        . $o->lat . ', ' . $o->lon . "\n";
 
 
+die();
 
 // let's edit the last one from above
 
