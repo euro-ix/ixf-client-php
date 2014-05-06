@@ -14,9 +14,9 @@ abstract class ApiResource extends Object
     /**
      * @returns IXF_ApiResource The refreshed resource.
      */
-    public function refresh($resource='')
+    public function refresh($resource)
     {
-        $url = $this->instanceUrl(null,$resource);
+        $url = $url = '/' . $resource . '/' . $this->id;
 
         $requestor = new ApiRequestor();
         $response = $requestor->request(
@@ -29,73 +29,6 @@ abstract class ApiResource extends Object
         return $this;
     }
 
-    /**
-     * @returns string The full API URL for this API resource.
-     */
-    public function instanceUrl( $type = null, $resource = '' )
-    {
-        $id = $this['id'];
-        $class = get_class($this);
-
-        if (!$id) {
-            $message = "Could not determine which URL to request: "
-                . "$class instance has invalid ID: $id";
-            throw new Error\InvalidRequest($message, null);
-        }
-
-        $extn = urlencode( ApiRequestor::utf8($id) );
-
-        switch( $type )
-        {
-            case 'save':
-                return "/update/{$resource}/{$extn}";
-
-            default:
-                return "/{$resource}?id=$extn";
-        }
-    }
-
-    /**
-     * @param string $class
-     *
-     * @returns string The name of the class, with namespacing and underscores
-     *    stripped.
-     */
-    public static function className($class)
-    {
-        // Useful for namespaces: Foo\IXF_Charge
-        if ($postfix = strrchr($class, '\\'))
-            $class = substr($postfix, 1);
-        if (substr($class, 0, strlen('IXF')) == 'IXF')
-            $class = substr($class, strlen('IXF'));
-        $class = str_replace('_', '', $class);
-        $name = urlencode($class);
-        $name = strtolower($name);
-
-        return $name;
-    }
-
-    /**
-     * @param string $class
-     *
-     * @returns string The endpoint URL for the given class.
-     */
-    public static function classUrl($class)
-    {
-        $base = ucfirst( self::_scopedLsb($class, 'className', $class) );
-
-        return "/${base}s";
-    }
-
-
-    private static function _validateCall($method, $params=null)
-    {
-        if ($params !== null && !is_array($params)) {
-            $message = "You must pass an array as the first argument to IXF API "
-                . "method calls.";
-            throw new Error($message);
-        }
-    }
 
     protected static function scopedAll($class, $params=null, $resource)
     {
@@ -115,7 +48,7 @@ abstract class ApiResource extends Object
     {
         self::_validateCall('create', $params);
         $requestor = new ApiRequestor();
-        $url = '/create/' . $resource;
+        $url = '/' . $resource;
         return $requestor->request('post', $url, $params);
     }
 
@@ -127,8 +60,8 @@ abstract class ApiResource extends Object
         $params = $this->serializeParameters();
 
         if( count( $params ) > 0 ) {
-            $url = '/update/' . $resource . '/' . $this->id;
-            $response = $requestor->request('post', $url, $params);
+            $url = '/' . $resource . '/' . $this->id;
+            $response = $requestor->request('put', $url, $params);
 
             if( isset( $response['error'] ) )
                 return $response;
@@ -151,4 +84,15 @@ abstract class ApiResource extends Object
 
         return $response;
     }
+
+    private static function _validateCall($method, $params=null)
+    {
+        if ($params !== null && !is_array($params)) {
+            $message = "You must pass an array as the first argument to IXF API "
+                . "method calls.";
+            throw new Error($message);
+        }
+    }
+
+
 }

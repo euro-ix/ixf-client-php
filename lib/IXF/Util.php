@@ -68,7 +68,7 @@ abstract class Util
     public static function convertToIxfObject($resp)
     {
         $types = array(
-            'Ixps' => 'IXP',
+            'IXP' => 'IXP',
         );
 
         if( self::isList( $resp ) )

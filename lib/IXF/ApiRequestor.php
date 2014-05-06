@@ -146,13 +146,17 @@ class ApiRequestor
             case 'get':
                 $opts[CURLOPT_HTTPGET] = 1;
                 foreach( $params as $k => $v ) {
-
                     $absUrl .= ( ( strpos( $absUrl, '?' ) === false ) ? '?' : '&' ) . urlencode( $k ) . '=' . urlencode( $v );
                 }
                 break;
 
             case 'post':
                 $opts[CURLOPT_POST] = 1;
+                $opts[CURLOPT_POSTFIELDS] = self::encode($params);
+                break;
+
+            case 'put':
+                $opts[CURLOPT_CUSTOMREQUEST] = 'PUT';
                 $opts[CURLOPT_POSTFIELDS] = self::encode($params);
                 break;
 

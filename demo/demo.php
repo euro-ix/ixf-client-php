@@ -38,9 +38,6 @@ foreach( $objs as $o )
     echo $o->full_name . '[' . $o->short_name . '] => '
         . $o->lat . ', ' . $o->lon . "\n";
 
-
-die();
-
 // let's edit the last one from above
 
 echo "ID/Short name before:  " . $o->id . '/' . $o->short_name . "\n";

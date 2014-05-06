@@ -20,10 +20,10 @@ class IXP extends ApiResource
     public static function all($params=null)
     {
         $class = get_class();
-        return self::scopedAll($class, $params, 'Ixps');
+        return self::scopedAll($class, $params, 'IXP');
     }
 
-    public static function retrieve($id, $resource = 'Ixps')
+    public static function retrieve($id, $resource = 'IXP')
     {
         $class = get_class();
         return self::scopedRetrieve($class, $id, $resource);
@@ -37,7 +37,7 @@ class IXP extends ApiResource
     public function delete($params=null)
     {
         $class = get_class();
-        return self::scopedDelete($class, $params, 'Ixps');
+        return self::scopedDelete($class, $params, 'IXP');
     }
 
     /**
@@ -46,7 +46,7 @@ class IXP extends ApiResource
     public function save()
     {
         $class = get_class();
-        return self::scopedSave($class, 'Ixps');
+        return self::scopedSave($class, 'IXP');
     }
 
 
@@ -56,7 +56,7 @@ class IXP extends ApiResource
      *
      * @return IXP The created customer.
      */
-    public static function create($params=null, $resource = 'Ixps')
+    public static function create($params=null, $resource = 'IXP')
     {
         $class = get_class();
         return self::scopedCreate($class, $params, $resource);
