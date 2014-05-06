@@ -17,6 +17,14 @@ for an example list of includes.
 
 ## Usage
 
+First, prime the API with the endpoint (official end point to be provided when live) and your credentials:
+
+```php
+IXF\IXF::setApiBase( 'https://www.example.com/api' );
+IXF\IXF::setApiUser( 'guest' );
+IXF\IXF::setApiPass( 'guest' );
+```
+
 You can get an array of all IXPs and print their name, short name and latitude / longitude,
 as follows:
 
