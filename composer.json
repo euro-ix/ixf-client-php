@@ -1,0 +1,28 @@
+{
+    "name": "euro-ix/ixf-client-php",
+    "description": "PHP client for RESTful access to the IX-F database",
+    "keywords": [
+        "ix-f",
+        "ixp",
+        "peeringdb"
+    ],
+    "homepage": "https://github.com/euro-ix/ixf-client-php",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Barry O'Donovan",
+            "email": "barry.odonovan@inex.ie"
+        }
+    ],
+    "require": {
+        "php": ">=5.3",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-mbstring": "*"
+    },
+    "autoload": {
+        "psr-0": {
+            "IXF": "lib/"
+        }
+    }
+}
