@@ -69,6 +69,7 @@ abstract class Util
     {
         $types = array(
             'IXP' => 'IXP',
+            'ORG' => 'ORG'
         );
 
         if( self::isList( $resp ) )
