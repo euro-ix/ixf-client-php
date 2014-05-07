@@ -172,7 +172,7 @@ class ApiRequestor
         $opts[CURLOPT_URL] = $absUrl;
 
         if( IXF::getDebug() )
-            echo "\n{$absUrl}";
+            echo "\n" . strtoupper( $method ) . ": {$absUrl}";
 
         $opts[CURLOPT_RETURNTRANSFER] = true;
         $opts[CURLOPT_CONNECTTIMEOUT] = 30;
