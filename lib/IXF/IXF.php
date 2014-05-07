@@ -35,6 +35,9 @@ abstract class IXF
      */
     public static $verifySslCerts = true;
 
+
+    public static $debug = false;
+
     const VERSION = '1.0.0';
 
     /**
@@ -120,5 +123,15 @@ abstract class IXF
     public static function setApiBase($apiBase)
     {
         self::$apiBase = $apiBase;
+    }
+
+    public static getDebug()
+    {
+        return self::$debug;
+    }
+
+    public static setDebug( $d )
+    {
+        self::$debug = $d;
     }
 }

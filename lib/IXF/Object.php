@@ -42,15 +42,6 @@ class Object implements \ArrayAccess
     // Standard accessor magic methods
     public function __set($k, $v)
     {
-        // IXF-FIXME
-        if ($v === "") {
-                throw new \InvalidArgumentException(
-                'You cannot set \''.$k.'\'to an empty string. '
-                .'We interpret empty strings as NULL in requests. '
-                .'You may set obj->'.$k.' = NULL to delete the property'
-            );
-        }
-
         $this->_values[$k] = $v;
 
         if (!self::$permanentAttributes->includes($k))
@@ -71,9 +62,12 @@ class Object implements \ArrayAccess
 
     public function __get($k)
     {
-        if (array_key_exists($k, $this->_values)) {
+        if( array_key_exists( $k, $this->_values ) )
+        {
             return $this->_values[$k];
-        } elseif ($this->_transientValues->includes($k)) {
+        }
+        elseif( $this->_transientValues->includes($k) )
+        {
             $class = get_class($this);
             $attrs = join(', ', array_keys($this->_values));
             // IXF-FIXME
@@ -200,28 +194,12 @@ class Object implements \ArrayAccess
         return $params;
     }
 
-    // Pretend to have late static bindings, even in PHP 5.2
-    protected function _lsb($method)
-    {
-        $class = get_class($this);
-        $args = array_slice(func_get_args(), 1);
-
-        return call_user_func_array(array($class, $method), $args);
-    }
-
-    protected static function _scopedLsb($class, $method)
-    {
-        $args = array_slice(func_get_args(), 2);
-
-        return call_user_func_array(array($class, $method), $args);
-    }
-
     public function __toJSON()
     {
         if (defined('JSON_PRETTY_PRINT'))
-        return json_encode($this->__toArray(true), JSON_PRETTY_PRINT);
+            return json_encode($this->__toArray(true), JSON_PRETTY_PRINT);
         else
-        return json_encode($this->__toArray(true));
+            return json_encode($this->__toArray(true));
     }
 
     public function __toString()
@@ -232,9 +210,9 @@ class Object implements \ArrayAccess
     public function __toArray($recursive=false)
     {
         if ($recursive)
-        return Util::convertIxfObjectToArray($this->_values);
+            return Util::convertIxfObjectToArray($this->_values);
         else
-        return $this->_values;
+            return $this->_values;
     }
 }
 

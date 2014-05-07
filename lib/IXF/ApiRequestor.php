@@ -171,6 +171,9 @@ class ApiRequestor
         $absUrl = self::utf8($absUrl);
         $opts[CURLOPT_URL] = $absUrl;
 
+        if( IXF::getDebug() )
+            echo "\n{$absUrl}";
+
         $opts[CURLOPT_RETURNTRANSFER] = true;
         $opts[CURLOPT_CONNECTTIMEOUT] = 30;
         $opts[CURLOPT_TIMEOUT] = 80;
