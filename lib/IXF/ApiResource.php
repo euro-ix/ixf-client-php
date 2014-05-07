@@ -62,7 +62,7 @@ abstract class ApiResource extends Object
         if( count( $params ) > 0 ) {
             $url = '/' . $resource . '/' . $this->id;
             $response = $requestor->request('put', $url, $params);
-
+            echo "\nPUT - $url";
             if( isset( $response['error'] ) )
                 return $response;
         }
