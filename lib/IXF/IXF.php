@@ -125,12 +125,12 @@ abstract class IXF
         self::$apiBase = $apiBase;
     }
 
-    public static getDebug()
+    public static function getDebug()
     {
         return self::$debug;
     }
 
-    public static setDebug( $d )
+    public static function setDebug( $d )
     {
         self::$debug = $d;
     }
