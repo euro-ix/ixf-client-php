@@ -125,7 +125,8 @@ class Object implements \ArrayAccess
     public function serializeParameters()
     {
         $params = array();
-        foreach( $this->_values->toArray() as $k )
+
+        foreach( $this->_values as $k )
         {
             $v = $this->$k;
             if( $v === NULL )
