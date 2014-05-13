@@ -126,11 +126,13 @@ class Object implements \ArrayAccess
     {
         $params = array();
 
-        foreach( $this->_values as $k )
+        foreach( $this->_values as $k => $v )
         {
-            $v = $this->$k;
-            if( $v === NULL )
-                $v = '';
+            if( substr( $k, 0, 1 ) == '_' )
+                continue;
+
+            if( in_array( $k, [ 'pk' ] ) )
+                continue;
 
             $params[$k] = $v;
         }
