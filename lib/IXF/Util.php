@@ -21,16 +21,17 @@ abstract class Util
     */
     public static function isList($array)
     {
-        if (!is_array($array))
+        if( !is_array( $array ) )
             return false;
 
         // using Stripe's library as a base for this was a cluster fuck of an idea.
         // why? figure this out:
         $keys = array_keys( $array );
-        if( count( $keys ) == 1 && !is_numeric( $keys[0] ) )
-            return true;
+        foreach( array_keys( $array ) as $i )
+            if( !is_numeric( $i ) )
+                return false;
 
-        return false;
+        return true;
     }
 
     /**
@@ -76,9 +77,8 @@ abstract class Util
         {
             $mapped = array();
 
-            $resp = array_pop( $resp );
             foreach( $resp as $k => $i )
-                array_push($mapped, self::convertToIxfObject($i));
+                array_push( $mapped, self::convertToIxfObject($i) );
 
             return $mapped;
         }
@@ -97,5 +97,15 @@ abstract class Util
         }
         else
             return $resp;
+    }
+
+    public static function randomString( $length = 12 )
+    {
+        $chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $randomString = '';
+        for( $i = 0; $i < $length; $i++ )
+            $randomString .= $chars[ rand( 0, strlen( $chars ) - 1 ) ];
+
+        return $randomString;
     }
 }
