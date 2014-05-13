@@ -7,7 +7,7 @@ abstract class ApiResource extends Object
     protected static function scopedRetrieve($class, $id, $resource)
     {
         $instance = new $class($id);
-        $instance->refresh($resource);
+        $instance->refresh( $resource );
         return $instance;
     }
 
@@ -24,7 +24,7 @@ abstract class ApiResource extends Object
             $url,
             $this->_retrieveOptions
         );
-        $this->refreshFrom($response);
+        $this->refreshFrom($response[0]);
 
         return $this;
     }
@@ -37,9 +37,6 @@ abstract class ApiResource extends Object
         $url = '/' . $resource;
         $response = $requestor->request('get', $url, $params);
 
-        if( isset( $response[ 'error' ] ) )
-            return( $response );
-
         return Util::convertToIxfObject($response);
     }
 
@@ -49,21 +46,21 @@ abstract class ApiResource extends Object
         self::_validateCall('create', $params);
         $requestor = new ApiRequestor();
         $url = '/' . $resource;
-        return $requestor->request('post', $url, $params);
+        return $requestor->request( 'post', $url, $params );
     }
 
 
     protected function scopedSave($class,$resource)
     {
-        self::_validateCall('save');
         $requestor = new ApiRequestor();
         $params = $this->serializeParameters();
+        self::_validateCall( 'save', $params );
+        unset( $params['id'] );
 
-        if( count( $params ) > 0 ) {
+        if( count( $params ) > 0 )
+        {
             $url = '/' . $resource . '/' . $this->id;
-            $response = $requestor->request('put', $url, $params);
-            if( isset( $response['error'] ) )
-                return $response;
+            return $requestor->request('put', $url, $params);
         }
 
         return true;
@@ -74,23 +71,16 @@ abstract class ApiResource extends Object
         self::_validateCall('delete');
         $requestor = new ApiRequestor();
         $url = '/' . $resource . '/' . $this->id;
-        $response = $requestor->request('delete', $url, $params);
-
-        if( is_array( $response ) && count( $response ) == 0 ) {
-            $this->refreshFrom($response);
-            return true;
-        }
-
-        return $response;
+        return $requestor->request('delete', $url, $params);
     }
 
     private static function _validateCall($method, $params=null)
     {
-        if ($params !== null && !is_array($params)) {
-            $message = "You must pass an array as the first argument to IXF API "
-                . "method calls.";
-            throw new Error($message);
-        }
+        if ($params !== null && !is_array($params))
+            throw new Error( "You must pass an array as the first argument to IXF API method calls." );
+
+        if( $method == 'save' && !isset( $params['id'] ) )
+            throw new Error( "Invalid save - object does not have an ID." );
     }
 
 

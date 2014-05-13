@@ -24,18 +24,6 @@ class ApiRequestor
         }
     }
 
-
-    /**
-     * @param array       $arr    An map of param keys to values.
-     * @param string|null $prefix (It doesn't look like we ever use $prefix...)
-     *
-     * @returns string A querystring, essentially.
-     */
-    public static function encode( $params )
-    {
-        return 'arg=' . urlencode( $params );
-    }
-
     /**
      * @param string     $method
      * @param string     $url
@@ -46,14 +34,14 @@ class ApiRequestor
      */
     public function request($method, $url, $params=null)
     {
-        if (!$params)
+        if( $params === null )
             $params = array();
 
-        list($rbody, $rcode) = $this->requestRaw($method, $url, $params);
+        list( $rbody, $rcode ) = $this->requestRaw( $method, $url, $params );
 
-        $resp = $this->interpretResponse($rbody, $rcode);
+        $resp = $this->interpretResponse( $rbody, $rcode, $method );
 
-        return $resp;
+        return $resp['data'];
     }
 
     /**
@@ -66,33 +54,35 @@ class ApiRequestor
      *                              permissions.
      * @throws Error\Api            otherwise.
      */
-    public function handleApiError($rbody, $rcode, $resp)
+    public function handleApiError( $rbody, $rcode, $resp )
     {
-        if (!is_array($resp) || !isset($resp['error'])) {
+        if( !is_array( $resp ) || !isset( $resp['meta'] ) )
+        {
             $msg = "Invalid response object from API: $rbody "
-                ."(HTTP response code was $rcode)";
+                . "(HTTP response code was $rcode)";
 
             throw new Error\Api($msg, $rcode, $rbody, $resp);
         }
 
-        $error = $resp['error'];
-        $msg = isset($error['message']) ? $error['message'] : null;
-        $param = isset($error['param']) ? $error['param'] : null;
-        $code = isset($error['code']) ? $error['code'] : null;
+        $error = $resp['meta']['error'];
+        $msg   = isset( $error['message'] ) ? $error['message'] : null;
+        $param = isset( $error['param']   ) ? $error['param']   : null;
+        $code  = isset( $error['code']    ) ? $error['code']    : null;
 
-        switch ($rcode) {
+        switch( $rcode )
+        {
             case 404:
-                throw new \InvalidRequestError(
-                    $msg, $param, $rcode, $rbody, $resp
-                );
+                throw new Error\NotFound( $msg, $param, $rcode, $rbody, $resp );
+
             case 401:
-                throw new Error\AuthenticationError($msg, $rcode, $rbody, $resp);
+                throw new Error\AuthenticationError( $msg, $rcode, $rbody, $resp );
+
             default:
-                throw new Error\Api($msg, $rcode, $rbody, $resp);
+                throw new Error\Api( $msg, $rcode, $rbody, $resp );
         }
     }
 
-    private function requestRaw($method, $url, $params)
+    private function requestRaw( $method, $url, $params )
     {
         if( is_array( $params ) && count( $params ) && $method != 'get' )
             $params = json_encode( $params );
@@ -118,29 +108,47 @@ class ApiRequestor
         );
     }
 
-    private function interpretResponse($rbody, $rcode)
+    private function interpretResponse( $rbody, $rcode, $method )
     {
-        try {
-            $resp = json_decode($rbody, true);
-        } catch (Exception $e) {
+        try
+        {
+            $resp = json_decode( $rbody, true );
+        }
+        catch( Exception $e )
+        {
             throw new Error\Api(
                 "Invalid response body from API: $rbody (HTTP response code was $rcode)",
                 $rcode, $rbody
             );
         }
 
-        if ($rcode < 200 || $rcode >= 300) {
-            $this->handleApiError($rbody, $rcode, $resp);
+        if( $rcode < 200 || $rcode >= 300 )
+            $this->handleApiError( $rbody, $rcode, $resp );
+
+        switch( $method )
+        {
+            case 'post':
+                if( isset( $resp['meta']['url'] ) )
+                {
+                    // create - send back the new ID
+                    return [ 'data' => substr( $resp['meta']['url'], strrpos( $resp['meta']['url'], '/' ) + 1 ) ];
+                }
+
+            case 'put':
+            case 'delete':
+                return [ 'data' => true ];
         }
 
         return $resp;
     }
 
-    private function curlRequest($method, $absUrl, $headers, $params)
+    private function curlRequest( $method, $absUrl, $headers, $params )
     {
         $curl = curl_init();
-        $method = strtolower($method);
+        $method = strtolower( $method );
         $opts = array();
+
+        $headers[] = 'Accept: application/json';
 
         switch( $method ) {
             case 'get':
@@ -151,13 +159,17 @@ class ApiRequestor
                 break;
 
             case 'post':
+                $headers[] = 'Content-length: ' . strlen( $params );
+                $headers[] = 'Content-type: application/json';
+                $opts[CURLOPT_POSTFIELDS]  = $params;
                 $opts[CURLOPT_POST] = 1;
-                $opts[CURLOPT_POSTFIELDS] = self::encode($params);
                 break;
 
             case 'put':
+                $opts[CURLOPT_POSTFIELDS]    = $params;
                 $opts[CURLOPT_CUSTOMREQUEST] = 'PUT';
-                $opts[CURLOPT_POSTFIELDS] = self::encode($params);
+                $headers[] = 'Content-length: ' . strlen( $params );
+                $headers[] = 'Content-type: application/json';
                 break;
 
             case 'delete':
@@ -201,6 +213,7 @@ class ApiRequestor
         }
 
         $rcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
         curl_close($curl);
 
         return array($rbody, $rcode);

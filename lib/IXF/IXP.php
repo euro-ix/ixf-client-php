@@ -59,6 +59,6 @@ class IXP extends ApiResource
     public static function create($params=null, $resource = 'IXP')
     {
         $class = get_class();
-        return self::scopedCreate($class, $params, $resource);
+        return self::scopedCreate( $class, $params, $resource );
     }
 }
