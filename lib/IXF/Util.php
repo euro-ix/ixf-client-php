@@ -14,11 +14,11 @@ namespace IXF;
 abstract class Util
 {
     /**
-    * Whether the provided array (or other) is a list rather than a dictionary.
-    *
-    * @param array|mixed $array
-    * @return boolean True if the given object is a list.
-    */
+     * Whether the provided array (or other) is a list rather than a dictionary.
+     *
+     * @param array|mixed $array
+     * @return boolean True if the given object is a list.
+     */
     public static function isList($array)
     {
         if( !is_array( $array ) )
@@ -35,15 +35,16 @@ abstract class Util
     }
 
     /**
-    * Recursively converts the PHP IXF object to an array.
-    *
-    * @param array $values The PHP IXF object to convert.
-    * @return array
-    */
+     * Recursively converts the PHP IXF object to an array.
+     *
+     * @param array $values The PHP IXF object to convert.
+     * @return array
+     */
     public static function convertIxfObjectToArray($values)
     {
         $results = array();
-        foreach ($values as $k => $v) {
+        foreach ($values as $k => $v)
+        {
             // FIXME: this is an encapsulation violation
             if ($k[0] == '_') {
                 continue;
@@ -68,11 +69,6 @@ abstract class Util
     */
     public static function convertToIxfObject($resp)
     {
-        $types = array(
-            'IXP' => 'IXP',
-            'ORG' => 'ORG'
-        );
-
         if( self::isList( $resp ) )
         {
             $mapped = array();
@@ -88,11 +84,7 @@ abstract class Util
             if( isset( $resp['_id'] ) )
                 $type = substr( $resp['_id'], 0, strpos( $resp['_id'], "." ) );
 
-            if( isset( $types[ $type ] ) )
-                $class = $types[ $type ];
-            else
-                $class = 'Object';
-
+            $class = ApiResource::resolveClassName( $type );
             return Object::scopedConstructFrom($class, $resp);
         }
         else

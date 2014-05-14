@@ -3,8 +3,6 @@
 /*
 * IXF Database - PHP Client
 *
-* Based on the Stripe API client.
-*
 * See: https://github.com/euro-ix/ixf-client-php
 * License: MIT
 */
@@ -17,6 +15,7 @@ abstract class IXF
      * @var string The IXF API username to be used for requests.
      */
     public static $apiUser = 'guest';
+
     /**
      * @var string The IXF API password to be used for requests.
      */
@@ -26,10 +25,12 @@ abstract class IXF
      * @var string The base URL for the IXF API.
      */
     public static $apiBase = '';
+
     /**
      * @var string|null The version of the IXF API to use for requests.
      */
     public static $apiVersion = null;
+
     /**
      * @var boolean Defaults to true.
      */

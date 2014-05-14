@@ -79,7 +79,6 @@ class Object implements \ArrayAccess
     */
     public static function scopedConstructFrom($class, $values)
     {
-        $class = 'IXF\\' . $class;
         if( isset( $values[ 'pk' ] ) )
             $values[ 'id' ] = $values[ 'pk' ];
 
@@ -138,6 +137,11 @@ class Object implements \ArrayAccess
         }
 
         return $params;
+    }
+
+    public function getType()
+    {
+        return substr( $this->_id, 0, strpos( $this->_id, "." ) );
     }
 
     public function __toJSON()

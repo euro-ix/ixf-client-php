@@ -4,7 +4,8 @@ PHP RESTful interface for the IXF database,
 
 ## Installation
 
-This library is best used with Composer. Just add the following to your `composer.json`:
+This library is best used with Composer. Just add the following to
+your `composer.json`:
 
 ```json
 "require": {
@@ -29,7 +30,7 @@ You can get an array of all IXPs and print their name, short name and latitude /
 as follows:
 
 ```php
-$ixps = IXF\IXP::all();
+$ixps = IXF\ApiResource::all( 'IXP' );
 
 foreach( $ixps as $o )
     echo $o->full_name . '[' . $o->short_name . '] => ' . $o->lat . ', ' . $o->lon . "\n";
@@ -38,7 +39,7 @@ foreach( $ixps as $o )
 You can use skip and limit options as follows:
 
 ```php
-$ixps = IXF\IXP::all( [ 'skip' => 10, 'limit' => 5 ] );
+$ixps = IXF\ApiResource::all( 'IXP', [ 'skip' => 10, 'limit' => 5 ] );
 ```
 
 The default ordering is by ID.
@@ -46,7 +47,7 @@ The default ordering is by ID.
 You can fetch a specific IXP by id and edit it as follows:
 
 ```php
-$ixp = IXF\IXP::retrieve( $id );
+$ixp = IXF\ApiResource::retrieve( 'IXP', $id );
 $ixp->short_name = 'NEW_SHORTNAME';
 $ixp->save();
 ```
@@ -60,28 +61,37 @@ $ixp->delete();
 Finally, create an IXP via:
 
 ```php
-$newObjIdArray = IXF\IXP::create( [
-    "full_name" => "Test IXP",
-    "short_name" => "TIXP"
-] );
+$newObjId = IXF\ApiResource::create( 'IXP',
+    [
+        "full_name" => "Test IXP",
+        "short_name" => "TIXP"
+    ]
+);
 
-if( is_array( $newObjIdArray ) && !isset( $newObjIdArray['error'] ) )
-    echo "New IXP created with ID: " . $newObjIdArray['id'] . "\n";
-else
-    echo "ERROR: " . $newObjIdArray['error'] . "\n";
+$newIXP = IXF\ApiResource::retrieve( 'IXP', $newObjId );
 ```
 
 Complete documentation can be found in the [wiki](https://github.com/euro-ix/ixf-client-php/wiki).
 
 
+## Documentation and Tests
+
+See the [tests/](https://github.com/euro-ix/ixf-client-php/blob/master/tests)
+for sample test suites which will show how the code works.
+
+We'll link API documentation when it's uploaded.
+
 ## Source / Origin Story
 
-[Stripe](https://stripe.com/) created  a beautiful [API](https://stripe.com/docs/api/php)
-for the payment gateway. They open sourced the PHP library under the MIT license. This
-library is based on that.
+Written by [Barry O'Donovan](https://github.com/barryo) of [INEX](https://www.inex.ie/) during
+the May 2014 euro-ix hackaton in Sheffield, UK.
 
-*(a few hours later)* Hmmmm... beautiful API interface, horrendously coded API
-library. It was a mistake to use it but that's a bed I've made for myself now.
-I've stripped 50% of the code and it's still horrible. But, if you're using
-the client, what lies beneath is irrelevant. I must still recode / fix it
-though.
+Issues and pull requests are welcomed.
+
+[Stripe](https://stripe.com/) created  a beautiful [API](https://stripe.com/docs/api/php)
+for their payment gateway. They open sourced the PHP library under the
+MIT license. This library is based on that.
+
+*(a few hours later)* Hmmmm... beautiful API interface, horrendously coded
+API library. It was a mistake to use it but that's a bed I've made for
+myself now. I've stripped 70% of the cruft and it's slightly more palatable.

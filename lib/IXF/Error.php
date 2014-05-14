@@ -1,4 +1,10 @@
 <?php
+/*
+* IXF Database - PHP Client
+*
+* See: https://github.com/euro-ix/ixf-client-php
+* License: MIT
+*/
 
 namespace IXF;
 
@@ -11,7 +17,7 @@ class Error extends \Exception
     const ERROR_USAGE               = 104;
     const ERROR_INTERNAL            = 500;
     const ERROR_AUTHENTICATION      = 401;
-    
+
 
     public function __construct($message, $httpStatus=null, $httpBody=null, $jsonBody=null)
     {

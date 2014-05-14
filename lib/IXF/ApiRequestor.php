@@ -1,38 +1,53 @@
 <?php
 
+
+/*
+* IXF Database - PHP Client
+*
+* See: https://github.com/euro-ix/ixf-client-php
+* License: MIT
+*/
+
 namespace IXF;
 
+/**
+ * Perform RESTful API requests against a REST service
+ */
 class ApiRequestor
 {
+    /**
+     * Can be used to hardcode invalid SSL certs
+     */
     private static function blacklistedCerts()
     {
         return array();
     }
 
     /**
-     * @param string|mixed $value A string to UTF8-encode.
+     * Convert a string to UTF8
      *
-     * @returns string|mixed The UTF8-encoded string, or the object passed in if
+     * @param string $value A string to UTF8-encode.
+     * @return string The UTF8-encoded string, or the object passed in if
      *    it wasn't a string.
      */
     public static function utf8($value)
     {
-        if ( is_string($value) && mb_detect_encoding($value, "UTF-8", TRUE) != "UTF-8") {
+        if( is_string($value) && mb_detect_encoding($value, "UTF-8", TRUE) != "UTF-8")
             return utf8_encode($value);
-        } else {
-            return $value;
-        }
+
+        return $value;
     }
 
     /**
-     * @param string     $method
-     * @param string     $url
-     * @param array|null $params
+     * Perform an API request
      *
-     * @return array An array whose first element is the response and second
-     *               element is the API key used to make the request.
+     * @param string     $method One of put/post/get/delete
+     * @param string     $url    The URL of the service
+     * @param array|null $params Parameters to pass
+     *
+     * @return mixed Defined by the method. See the ApiResource methods.
      */
-    public function request($method, $url, $params=null)
+    public function request( $method, $url, $params=null )
     {
         if( $params === null )
             $params = array();
@@ -45,13 +60,14 @@ class ApiRequestor
     }
 
     /**
+     * Throw an appropriate exception for an APU error
      * @param string $rbody A JSON string.
      * @param int    $rcode
      * @param array  $resp
      *
+     * @throws Error\NotFound       if an invalid target URL / no such object for a GET
      * @throws Error\InvalidRequest if the error is caused by the user.
-     * @throws Error\Authentication if the error is caused by a lack of
-     *                              permissions.
+     * @throws Error\Authentication if the error is caused by a lack o permissions.
      * @throws Error\Api            otherwise.
      */
     public function handleApiError( $rbody, $rcode, $resp )
@@ -100,12 +116,7 @@ class ApiRequestor
             'User-Agent: IXF/v1 PhpBindings/' . IXF::VERSION
         );
 
-        return $this->curlRequest(
-            $method,
-            IXF::$apiBase . $url,
-            $headers,
-            $params
-        );
+        return $this->curlRequest( $method, IXF::$apiBase . $url, $headers, $params );
     }
 
     private function interpretResponse( $rbody, $rcode, $method )
@@ -227,21 +238,24 @@ class ApiRequestor
     public function handleCurlError($errno, $message)
     {
         $apiBase = IXF::$apiBase;
-        switch ($errno) {
+        switch ($errno)
+        {
             case CURLE_COULDNT_CONNECT:
             case CURLE_COULDNT_RESOLVE_HOST:
             case CURLE_OPERATION_TIMEOUTED:
-            $msg = "Could not connect to IXF ($apiBase).  Please check your "
-            . "internet connection and try again.";
-            break;
+                $msg = "Could not connect to IXF ($apiBase).  Please check your "
+                    . "internet connection and try again.";
+                break;
+
             case CURLE_SSL_CACERT:
             case CURLE_SSL_PEER_CERTIFICATE:
-            $msg = "Could not verify IXF's SSL certificate.  Please make sure "
-            . "that your network is not intercepting certificates.  "
-            . "(Try going to $apiBase in your browser.)  ";
+                $msg = "Could not verify IXF's SSL certificate.  Please make sure "
+                    . "that your network is not intercepting certificates.  "
+                    . "(Try going to $apiBase in your browser.)  ";
             break;
+
             default:
-            $msg = "Unexpected error communicating with IXF.  ";
+                $msg = "Unexpected error communicating with IXF.  ";
         }
 
         $msg .= "\n\n(Network error [errno $errno]: $message)";
